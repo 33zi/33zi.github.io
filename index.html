@@ -1,3 +1,347 @@
-<html>
-  <p>HELLO</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      text-align: center;
+    }
+    
+    .password-input{
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 200px;
+      font-size: 15px;
+    }
+    
+    .submit-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+pre {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 15px;
+      white-space: pre-wrap;
+    }
+
+hr {
+  border: none;
+      border-top: 1px solid #ccc;
+      margin: 20px 0;
+    }
+
+#hamburgerMenu {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.line {
+  width: 100%;
+  height: 4px;
+  background: #000;
+  margin-bottom: 6px;
+  transition: transform 0.3s ease;
+}
+
+
+#hamburgerMenu.closed .line:nth-child(2) {
+  opacity: 1;
+}
+
+#hamburgerMenu.open .line:nth-child(1) {
+  transform: rotate(45deg) translate(7px, 7px);
+}
+
+#hamburgerMenu.open .line:nth-child(2) {
+  opacity: 0;
+}
+
+#hamburgerMenu.open .line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+#slideMenu {
+  position: fixed;
+  top: 0;
+  left: -300px; /* Off-screen position */
+  width: 300px;
+  height: 100%;
+  background: #f0f0f0;
+  transition: left 0.3s ease;
+}
+
+.container.slide-menu-open #slideMenu {
+  left: 0; /* Show menu position */
+}
+
+#slideMenu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#slideMenu li {
+  margin-bottom: 10px;
+}
+
+#slideMenu a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+#slideMenu a:hover {
+  background-color: #ccc;
+}
+
+.containeroverlay {
+  position: fixed;
+  margin: 0px auto;
+  width: 340px;
+}
+
+#overlayMenu {
+  display: none;
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#overlayMenu.show {
+  display: block;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+  <div id="hamburgerMenu" class="closed">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+  <div id="slideMenu">
+    <ul>
+    <li><a href="enc - auto.html" style="margin-top: 80px" target="_blank">Open Encode form</a></li>
+    <li><a href="#" style="margin-top: 0px" id="openoverlaymenu">Store new data set</a></li>
+  </ul>
+  </div>
+
+  <div class="containeroverlay">
+     <div id="overlayMenu">
+       <input type="text" id="settingsInputNumbers" class="password-input" style="width: 300px" placeholder="Paste data"><br>
+       <input type="text" id="settingsSalt" class="password-input" style="width: 300px" placeholder="Paste Salt"><br>
+       <input type="text" id="settingsIV" class="password-input" style="width: 300px" placeholder="Paste IV"><br>
+       <button id="storeBtn" class="submit-button">Save new data set</button>
+       <button id="cancelBtn" class="submit-button">Cancel</button>
+  </div>
+
+  </div>
+  
+  <div class="containerdecrypt">
+  <form id="decryptForm">
+    <input type="password" id="decryptionPassword" class="password-input" placeholder="Enter password" autocomplete="current-password" required />
+    <input type="user" style="display: none" autocomplete="username" />
+    <button type="submit" class="submit-button">Continue</button>
+  </form>
+  </div>
+
+<hr>
+
+  <div>
+    <pre id="decryptedData"></pre>
+  </div>
+  </div>
+
+  <script>
+
+    function base64ToArrayBuffer(base64) {
+      var binaryString = window.atob(base64);
+      var bytes = new Uint8Array(binaryString.length);
+      for (var i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    async function decryptData(encryptedDataBuffer, saltBuffer, ivBuffer, password) {
+      var passwordBuffer = new TextEncoder().encode(password);
+      var importedKey = await window.crypto.subtle.importKey(
+        "raw",
+        passwordBuffer,
+        {
+          name: "PBKDF2"
+        },
+        false,
+        ["deriveKey"]
+      );
+
+      var decryptionKey = await window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: saltBuffer,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        importedKey,
+        {
+          name: "AES-CBC",
+          length: 128
+        },
+        true,
+        ["decrypt"]
+      );
+
+      var decryptedDataBuffer = await window.crypto.subtle.decrypt(
+        {
+          name: "AES-CBC",
+          iv: ivBuffer
+        },
+        decryptionKey,
+        encryptedDataBuffer
+      );
+
+      var decryptedDataString = new TextDecoder().decode(decryptedDataBuffer);
+      var decryptedData = JSON.parse(decryptedDataString);   
+
+	document.getElementById("decryptedData").innerHTML = JSON.stringify(decryptedData, null, 2).replace(/\\n/g, '<br>').replace(/^"(.*)"$/, "$1");
+
+// Detect when the visibility of the page changes
+        document.addEventListener("visibilitychange", function() {
+            if (document.visibilityState === "hidden") {
+                document.getElementById("decryptedData").innerHTML = "";
+		document.getElementById("decryptionPassword").value = "";
+            }
+        });
+	
+    }
+
+    document.getElementById("decryptForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      var password = document.getElementById("decryptionPassword").value;
+      var encryptedDataString = "ZS1AsmUBz+JcYqj2/hFryc9BKtIDYX4k/i77u39VTiVN1465oa8i1aU3mApvMzhHK95LdL2b/9/RMmMgaXe5oZfgdmsB1WKtp0yQrxVbOM8P4QKFDIHiMd3xjd6zoXTMw3UDE0f4XjiuOe3hUDo6MGCIReHxOwNzzFULHZEOqcAhK3COV+AKUVVFzH4Vhbg/9EP1KUBk9tAGupL/JaPFg7jhJRkZ80FHybCqs8YJxUR0DbV9oMt4oL1rZSJLoXnMKgrnWcKepxmem71y2o+0qf8LRwHvBr3ognV/KCbIaEVaCVLPIkgjbObFFvT/KUtfptkwZQbUVlWZAKlGHafkdjFo/OcWUDNEF2pXBwDTc6yvKBTYEW2MDFW7mC9UcsCFaEL8VGyhl+HpZeqjfL6Y7EW4daYzCMiJ26cjTQ7j/35uSJDRaksnuKwf3o5rx4y9kWPfoX1IuqCz9VHBfLV/D48f3ohN0eS0o8AJ0FIRV8qck9+tgoSd/3ZORW798Be9IYk+vR0Nvmk/hCE7sQNcPPnWvmFnt4x4nQz9Ynm2JS8UBTnBs1wWwp5DTH8oTzkooU83Z4v1Fl+omI2unOoJthxawZLbBnUgxP66q3ocWhugqkeF8E8xKboDEjUPR0ZC77IHoVp6urzP/U/BH0MzIzo2Al1Gdg4ZE+L15iZm1YILuphfvcv0ItvtxIlButD/Jq/thaOXrLkwrDVzqc+IUAJub9/Q1nU1u2ZmXh1HHDulIy/kQT5ANxrTaT2BvPHy"; // Place the encrypted data string here
+
+      // Place the salt and iv strings here
+      var saltString = "knFGqVIgo/oOl243PqxArw==";
+      var ivString = "JwGUczX407xpwIa3wcHjHQ==";
+
+      var encryptedDataBuffer = base64ToArrayBuffer(encryptedDataString);
+      var saltBuffer = base64ToArrayBuffer(saltString);
+      var ivBuffer = base64ToArrayBuffer(ivString);
+
+      decryptData(encryptedDataBuffer, saltBuffer, ivBuffer, password);
+
+      });
+  </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var hamburgerMenu = document.getElementById("hamburgerMenu");
+  var container = document.querySelector(".container");
+  var slideMenu = document.getElementById("slideMenu");
+  var overlayMenu = document.getElementById("overlayMenu");
+  var StoredataBtn = document.getElementById("openoverlaymenu");
+  var cancelBtn = document.getElementById("cancelBtn");
+
+  hamburgerMenu.addEventListener("click", function() {
+    container.classList.toggle("slide-menu-open");
+    hamburgerMenu.classList.toggle("open");
+
+    if (container.classList.contains("slide-menu-open")) {
+      slideMenu.style.display = "block";
+    } else {
+      slideMenu.style.display = "none";
+    }
+  });
+
+  StoredataBtn.addEventListener("click", function() {
+    slideMenu.style.display = "none";
+    container.classList.toggle("slide-menu-open");
+    hamburgerMenu.classList.toggle("open");
+    overlayMenu.classList.toggle("show");
+  });
+
+  cancelBtn.addEventListener("click", function() {
+    //overlayMenu.classList.toggle("show");
+
+     // Read the cookie
+      var cookies = document.cookie.split(';');
+
+      // Find the values for the specific fields
+      var field1Value = '';
+      var field2Value = '';
+      var field3Value = '';
+      cookies.forEach(function(cookie) {
+        var parts = cookie.split('=');
+        var cookieName = decodeURIComponent(parts[0].trim());
+        var cookieValue = decodeURIComponent(parts[1].trim());
+        if (cookieName === 'field1') {
+          field1Value = cookieValue;
+        } else if (cookieName === 'field2') {
+          field2Value = cookieValue;
+        } else if (cookieName === 'field3') {
+          field3Value = cookieValue;
+        }
+      });
+
+      // Set the values in the text fields
+      alert(field3Value);
+  });
+
+  storeBtn.addEventListener("click", function() {
+      var field1Value = document.getElementById('settingsInputNumbers').value;
+      var field2Value = document.getElementById('settingsSalt').value;
+      var field3Value = document.getElementById('settingsIV').value;
+
+      // Create the cookie string
+      var cookieString =
+        encodeURIComponent('field1') + '=' + encodeURIComponent(field1Value) + '; ' +
+        encodeURIComponent('field2') + '=' + encodeURIComponent(field2Value) + '; ' +
+        encodeURIComponent('field3') + '=' + encodeURIComponent(field3Value);
+
+      // Set the cookie with an expiry date
+      var expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Expires in 1 year
+      cookieString += '; expires=' + expiryDate.toUTCString();
+
+      // Set the cookie path to restrict it to this specific HTML site
+      cookieString += '; path=/'; // Replace "/" with your site's path if necessary
+
+      // Set the cookie
+      document.cookie = cookieString;
+
+      alert('Content saved in the cookie.');
+  });
+
+});
+</script>
+
+</body>
 </html>
