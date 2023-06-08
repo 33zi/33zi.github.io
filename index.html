@@ -1,4 +1,4 @@
-<!--9:12--> 
+<!--9:15--> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -289,28 +289,28 @@ document.addEventListener("DOMContentLoaded", function() {
   cancelBtn.addEventListener("click", function() {
     //overlayMenu.classList.toggle("show");
 
-     // Read the cookie
-      var cookies = document.cookie.split(';');
+    // Read the cookie
+    var cookies = document.cookie.split(';');
 
-      // Find the values for the specific fields
-      var field1Value = '';
-      var field2Value = '';
-      var field3Value = '';
-      cookies.forEach(function(cookie) {
-        var parts = cookie.split('=');
-        var cookieName = decodeURIComponent(parts[0].trim());
-        var cookieValue = decodeURIComponent(parts[1].trim());
-        if (cookieName === 'field1') {
-          field1Value = cookieValue;
-        } else if (cookieName === 'field2') {
-          field2Value = cookieValue;
-        } else if (cookieName === 'field3') {
-          field3Value = cookieValue;
-        }
-      });
+    // Find the cookie for fieldValues
+    var fieldValuesCookie = '';
+    cookies.forEach(function(cookie) {
+      var trimmedCookie = cookie.trim();
+      if (trimmedCookie.indexOf('fieldValues=') === 0) {
+        fieldValuesCookie = trimmedCookie;
+      }
+    });
+
+    // Get the field values from the cookie
+    if (fieldValuesCookie) {
+      var fieldValuesString = decodeURIComponent(fieldValuesCookie.split('=')[1]);
+      var fieldValues = JSON.parse(fieldValuesString);
 
       // Set the values in the text fields
-      alert(field3Value);
+      document.getElementById('field1').value = fieldValues.field1;
+      document.getElementById('field2').value = fieldValues.field2;
+      document.getElementById('field3').value = fieldValues.field3;
+    }
   });
 
   storeBtn.addEventListener("click", function() {
