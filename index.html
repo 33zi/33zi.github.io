@@ -1,4 +1,4 @@
-<!--9:24--> 
+<!--9:30--> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,7 +147,7 @@ hr {
   </div>
   <div id="slideMenu">
     <ul>
-    <li><a href="enc - auto.html" style="margin-top: 80px" target="_blank">Open Encode form</a></li>
+    <li><a href="encode.html" style="margin-top: 80px" target="_blank">Open Encode form</a></li>
     <li><a href="#" style="margin-top: 0px" id="openoverlaymenu">Store new data set</a></li>
   </ul>
   </div>
@@ -333,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // Set the cookie
       document.cookie = 'fieldValues=' + encodeURIComponent(fieldValuesString) + '; expires=' + expiryDate.toUTCString() + '; path=/';
 
-      alert('Content saved in the cookie.');
+      overlayMenu.classList.toggle("show");
   });
 
 });
