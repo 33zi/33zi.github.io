@@ -1,4 +1,4 @@
-<!--9:18--> 
+<!--9:24--> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -244,18 +244,39 @@ hr {
     document.getElementById("decryptForm").addEventListener("submit", function(event) {
       event.preventDefault();
       var password = document.getElementById("decryptionPassword").value;
-      var encryptedDataString = "ZS1AsmUBz+JcYqj2/hFryc9BKtIDYX4k/i77u39VTiVN1465oa8i1aU3mApvMzhHK95LdL2b/9/RMmMgaXe5oZfgdmsB1WKtp0yQrxVbOM8P4QKFDIHiMd3xjd6zoXTMw3UDE0f4XjiuOe3hUDo6MGCIReHxOwNzzFULHZEOqcAhK3COV+AKUVVFzH4Vhbg/9EP1KUBk9tAGupL/JaPFg7jhJRkZ80FHybCqs8YJxUR0DbV9oMt4oL1rZSJLoXnMKgrnWcKepxmem71y2o+0qf8LRwHvBr3ognV/KCbIaEVaCVLPIkgjbObFFvT/KUtfptkwZQbUVlWZAKlGHafkdjFo/OcWUDNEF2pXBwDTc6yvKBTYEW2MDFW7mC9UcsCFaEL8VGyhl+HpZeqjfL6Y7EW4daYzCMiJ26cjTQ7j/35uSJDRaksnuKwf3o5rx4y9kWPfoX1IuqCz9VHBfLV/D48f3ohN0eS0o8AJ0FIRV8qck9+tgoSd/3ZORW798Be9IYk+vR0Nvmk/hCE7sQNcPPnWvmFnt4x4nQz9Ynm2JS8UBTnBs1wWwp5DTH8oTzkooU83Z4v1Fl+omI2unOoJthxawZLbBnUgxP66q3ocWhugqkeF8E8xKboDEjUPR0ZC77IHoVp6urzP/U/BH0MzIzo2Al1Gdg4ZE+L15iZm1YILuphfvcv0ItvtxIlButD/Jq/thaOXrLkwrDVzqc+IUAJub9/Q1nU1u2ZmXh1HHDulIy/kQT5ANxrTaT2BvPHy"; // Place the encrypted data string here
+      //var encryptedDataString = "ZS1AsmUBz+JcYqj2/hFryc9BKtIDYX4k/i77u39VTiVN1465oa8i1aU3mApvMzhHK95LdL2b/9/RMmMgaXe5oZfgdmsB1WKtp0yQrxVbOM8P4QKFDIHiMd3xjd6zoXTMw3UDE0f4XjiuOe3hUDo6MGCIReHxOwNzzFULHZEOqcAhK3COV+AKUVVFzH4Vhbg/9EP1KUBk9tAGupL/JaPFg7jhJRkZ80FHybCqs8YJxUR0DbV9oMt4oL1rZSJLoXnMKgrnWcKepxmem71y2o+0qf8LRwHvBr3ognV/KCbIaEVaCVLPIkgjbObFFvT/KUtfptkwZQbUVlWZAKlGHafkdjFo/OcWUDNEF2pXBwDTc6yvKBTYEW2MDFW7mC9UcsCFaEL8VGyhl+HpZeqjfL6Y7EW4daYzCMiJ26cjTQ7j/35uSJDRaksnuKwf3o5rx4y9kWPfoX1IuqCz9VHBfLV/D48f3ohN0eS0o8AJ0FIRV8qck9+tgoSd/3ZORW798Be9IYk+vR0Nvmk/hCE7sQNcPPnWvmFnt4x4nQz9Ynm2JS8UBTnBs1wWwp5DTH8oTzkooU83Z4v1Fl+omI2unOoJthxawZLbBnUgxP66q3ocWhugqkeF8E8xKboDEjUPR0ZC77IHoVp6urzP/U/BH0MzIzo2Al1Gdg4ZE+L15iZm1YILuphfvcv0ItvtxIlButD/Jq/thaOXrLkwrDVzqc+IUAJub9/Q1nU1u2ZmXh1HHDulIy/kQT5ANxrTaT2BvPHy"; // Place the encrypted data string here
 
       // Place the salt and iv strings here
-      var saltString = "knFGqVIgo/oOl243PqxArw==";
-      var ivString = "JwGUczX407xpwIa3wcHjHQ==";
+      //var saltString = "knFGqVIgo/oOl243PqxArw==";
+      //var ivString = "JwGUczX407xpwIa3wcHjHQ==";
 
-      var encryptedDataBuffer = base64ToArrayBuffer(encryptedDataString);
-      var saltBuffer = base64ToArrayBuffer(saltString);
-      var ivBuffer = base64ToArrayBuffer(ivString);
+      //Read the cookie
+      var cookies = document.cookie.split(';');
 
-      decryptData(encryptedDataBuffer, saltBuffer, ivBuffer, password);
+      // Find the cookie for fieldValues
+      var fieldValuesCookie = '';
+      cookies.forEach(function(cookie) {
+        var trimmedCookie = cookie.trim();
+        if (trimmedCookie.indexOf('fieldValues=') === 0) {
+          fieldValuesCookie = trimmedCookie;
+        }
+      });
 
+      // Get the field values from the cookie
+      if (fieldValuesCookie) {
+        var fieldValuesString = decodeURIComponent(fieldValuesCookie.split('=')[1]);
+        var fieldValues = JSON.parse(fieldValuesString);
+
+        // Set the values in the text fields
+        encryptedDataString = fieldValues.field1;
+        saltString = fieldValues.field2;
+        ivString = fieldValues.field3;
+      }
+        var encryptedDataBuffer = base64ToArrayBuffer(encryptedDataString);
+        var saltBuffer = base64ToArrayBuffer(saltString);
+        var ivBuffer = base64ToArrayBuffer(ivString);
+
+        decryptData(encryptedDataBuffer, saltBuffer, ivBuffer, password);
       });
   </script>
 
@@ -287,30 +308,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   cancelBtn.addEventListener("click", function() {
-    //overlayMenu.classList.toggle("show");
-
-    // Read the cookie
-    var cookies = document.cookie.split(';');
-
-    // Find the cookie for fieldValues
-    var fieldValuesCookie = '';
-    cookies.forEach(function(cookie) {
-      var trimmedCookie = cookie.trim();
-      if (trimmedCookie.indexOf('fieldValues=') === 0) {
-        fieldValuesCookie = trimmedCookie;
-      }
-    });
-
-    // Get the field values from the cookie
-    if (fieldValuesCookie) {
-      var fieldValuesString = decodeURIComponent(fieldValuesCookie.split('=')[1]);
-      var fieldValues = JSON.parse(fieldValuesString);
-
-      // Set the values in the text fields
-      document.getElementById('settingsInputNumbers').value = fieldValues.field1;
-      document.getElementById('settingsSalt').value = fieldValues.field2;
-      document.getElementById('settingsIV').value = fieldValues.field3;
-    }
+    overlayMenu.classList.toggle("show");
   });
 
   storeBtn.addEventListener("click", function() {
