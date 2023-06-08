@@ -1,0 +1,269 @@
+<!--9:30-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store new data</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      text-align: center;
+    }
+    
+    .password-input{
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 200px;
+      font-size: 15px;
+    }
+    
+    .submit-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+pre {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 15px;
+      white-space: pre-wrap;
+    }
+
+hr {
+  border: none;
+      border-top: 1px solid #ccc;
+      margin: 20px 0;
+    }
+
+#hamburgerMenu {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.line {
+  width: 100%;
+  height: 4px;
+  background: #000;
+  margin-bottom: 6px;
+  transition: transform 0.3s ease;
+}
+
+
+#hamburgerMenu.closed .line:nth-child(2) {
+  opacity: 1;
+}
+
+#hamburgerMenu.open .line:nth-child(1) {
+  transform: rotate(45deg) translate(7px, 7px);
+}
+
+#hamburgerMenu.open .line:nth-child(2) {
+  opacity: 0;
+}
+
+#hamburgerMenu.open .line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+#slideMenu {
+  position: fixed;
+  top: 0;
+  left: -300px; /* Off-screen position */
+  width: 300px;
+  height: 100%;
+  background: #f0f0f0;
+  transition: left 0.3s ease;
+}
+
+.container.slide-menu-open #slideMenu {
+  left: 0; /* Show menu position */
+}
+
+#slideMenu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#slideMenu li {
+  margin-bottom: 10px;
+}
+
+#slideMenu a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+#slideMenu a:hover {
+  background-color: #ccc;
+}
+
+.containeroverlay {
+  position: fixed;
+  margin: 0px auto;
+  width: 340px;
+}
+
+#overlayMenu {
+  display: none;
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#overlayMenu.show {
+  display: block;
+}
+  </style>
+</head>
+<body>
+ <div class="container">
+  <h1>Generate Data set</h1>
+  <form id="encryptForm">
+    <input type="text" id="numbers" class="password-input" style="width: 300px" placeholder="Enter values (100)" required><br>
+    <input type="password" id="password" class="password-input" style="width: 300px" placeholder="Enter Password" required><br>
+    <button type="submit" class="submit-button">Generate</button>
+  </form>
+
+  <hr>
+
+  <div id="encryptedData" style="width: 400px; display: none; word-break: break-all;"></div>
+  <div id="saltAndIV" style="display: none;">
+    <p>Salt: <span id="salt"></span></p>
+    <p>IV: <span id="iv"></span></p>
+  </div>
+</div>
+<script>
+	
+function splitStringIntoBlocks(string) {
+  const blocks = string.match(/\d{2}/g);
+  return blocks.slice(0, 100); // Ensure we have exactly 100 two-digit blocks
+}
+
+function generateMatrix(blocks) {
+  const matrix = [];
+  const letters = 'ABCDEFGHIJ';
+  let output = '';
+
+  // Populate the matrix
+  output += '   <b>' + Array.from({ length: 10 }, (_, i) => i + 1).join('   ') + '</b><br>';
+  for (let i = 0; i < 10; i++) {
+    output += '<b>' + letters[i] + '</b>  ' + blocks.slice(i * 10, (i + 1) * 10).join('  ') + '<br>';
+  }
+
+  return output;
+}
+
+
+    document.getElementById("encryptForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      var password = document.getElementById("password").value;
+      var stringOfNumbers = document.getElementById("numbers").value;
+      var blocks = splitStringIntoBlocks(stringOfNumbers);
+      var data = generateMatrix(blocks);	
+      generateEncryptionKey(data, password);
+
+    });
+
+    async function generateEncryptionKey(data, password) {
+      var passwordBuffer = new TextEncoder().encode(password);
+      var salt = window.crypto.getRandomValues(new Uint8Array(16));
+
+      var importedKey = await window.crypto.subtle.importKey(
+        "raw",
+        passwordBuffer,
+        {
+          name: "PBKDF2"
+        },
+        false,
+        ["deriveKey"]
+      );
+
+      var encryptionKey = await window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        importedKey,
+        {
+          name: "AES-CBC",
+          length: 128
+        },
+        true,
+        ["encrypt"]
+      );
+
+      var iv = window.crypto.getRandomValues(new Uint8Array(16));
+
+      var dataString = JSON.stringify(data);
+      var dataBuffer = new TextEncoder().encode(dataString);
+
+      var encryptedData = await window.crypto.subtle.encrypt(
+        {
+          name: "AES-CBC",
+          iv: iv
+        },
+        encryptionKey,
+        dataBuffer
+      );
+
+      var encryptedDataString = arrayBufferToBase64(encryptedData);
+      var saltString = arrayBufferToBase64(salt);
+      var ivString = arrayBufferToBase64(iv);
+
+      var encryptedDataElement = document.getElementById("encryptedData");
+      encryptedDataElement.textContent = 'Data set copied to clipboard: ' + encryptedDataString;
+      
+	navigator.clipboard.writeText(encryptedDataString);
+
+      encryptedDataElement.setAttribute("data-salt", saltString);
+      encryptedDataElement.setAttribute("data-iv", ivString);
+      encryptedDataElement.style.display = "block";
+
+      var saltElement = document.getElementById("salt");
+      saltElement.textContent = saltString;
+
+      var ivElement = document.getElementById("iv");
+      ivElement.textContent = ivString;
+
+      var saltAndIVElement = document.getElementById("saltAndIV");
+      saltAndIVElement.style.display = "block";
+    }
+
+    function arrayBufferToBase64(buffer) {
+      var binary = "";
+      var bytes = new Uint8Array(buffer);
+      for (var i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return window.btoa(binary);
+    }
+  </script>
+</body>
+</html>
