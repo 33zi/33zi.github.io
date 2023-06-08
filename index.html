@@ -1,3 +1,4 @@
+<!--9:12--> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -317,24 +318,24 @@ document.addEventListener("DOMContentLoaded", function() {
       var field2Value = document.getElementById('settingsSalt').value;
       var field3Value = document.getElementById('settingsIV').value;
 
-      // Create the cookie string
-      var cookieString =
-        encodeURIComponent('field1') + '=' + encodeURIComponent(field1Value) + '; ' +
-        encodeURIComponent('field2') + '=' + encodeURIComponent(field2Value) + '; ' +
-        encodeURIComponent('field3') + '=' + encodeURIComponent(field3Value);
+      // Create an object to store the field values
+      var fieldValues = {
+        field1: field1Value,
+        field2: field2Value,
+        field3: field3Value
+      };
+
+      // Convert the object to a JSON string
+      var fieldValuesString = JSON.stringify(fieldValues);
 
       // Set the cookie with an expiry date
       var expiryDate = new Date();
-      expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Expires in 1 year
-      cookieString += '; expires=' + expiryDate.toUTCString();
-
-      // Set the cookie path to restrict it to this specific HTML site
-      cookieString += '; path=/'; // Replace "/" with your site's path if necessary
+      expiryDate.setFullYear(expiryDate.getFullYear() + 5); // Expires in 5 years
 
       // Set the cookie
-      document.cookie = cookieString;
+      document.cookie = 'fieldValues=' + encodeURIComponent(fieldValuesString) + '; expires=' + expiryDate.toUTCString() + '; path=/';
 
-      alert(cookieString);
+      alert('Content saved in the cookie.');
   });
 
 });
