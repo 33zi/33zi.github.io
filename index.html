@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function() {
   var slideMenu = document.getElementById("slideMenu");
   var overlayMenu = document.getElementById("overlayMenu");
   //var StoredataBtn = document.getElementById("openoverlaymenu");
-  var generatedatabtn = document.getElementById("generatedatabtn");
+  var databtn = document.getElementById("generatedatabtn");
   var cancelBtn = document.getElementById("cancelBtn");
 
   hamburgerMenu.addEventListener("click", function() {
@@ -318,7 +318,9 @@ document.addEventListener("DOMContentLoaded", function() {
     overlayMenu.classList.toggle("show");
   });
 
-  generatedatabtn.addEventListener("click", function() {
+  databtn.addEventListener("click", function() {
+    slideMenu.style.display = "none";
+    container.classList.toggle("slide-menu-open");
     hamburgerMenu.classList.toggle("open");
   });
 
