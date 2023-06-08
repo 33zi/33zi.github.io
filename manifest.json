@@ -1,11 +1,11 @@
 {
-    "name": "BK",
-    "short_name": "Web App",
+    "name": "CodeGuard",
+    "short_name": "CodeGuard",
     "start_url": "/index.html",
     "display": "standalone",
     "icons": [
       {
-        "src": "icon.png",
+        "src": "favicon.png",
         "sizes": "192x192",
         "type": "image/png"
       }
