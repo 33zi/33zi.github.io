@@ -145,43 +145,36 @@ hr {
 </head>
 <body>
   <div class="container">
-
-  <div id="hamburgerMenu" class="closed">
-    <div class="line"></div>
-    <div class="line"></div>
-    <div class="line"></div>
-  </div>
-  <div id="slideMenu">
-    <ul>
-    <li><a href="encode.html" style="margin-top: 80px" target="_blank" id="generatedatabtn">Generate data</a></li>
-    <!--<li><a href="#" style="margin-top: 0px" id="openoverlaymenu">Store new data set</a></li>-->
-  </ul>
-  </div>
-
-  <div class="containeroverlay">
-     <div id="overlayMenu">
-       <input type="text" id="settingsInputNumbers" class="password-input" style="width: 300px" placeholder="Paste data"><br>
-       <input type="text" id="settingsSalt" class="password-input" style="width: 300px" placeholder="Paste Salt"><br>
-       <input type="text" id="settingsIV" class="password-input" style="width: 300px" placeholder="Paste IV"><br>
-       <button id="storeBtn" class="submit-button">Save new data set</button>
-       <button id="cancelBtn" class="submit-button">Cancel</button>
-  </div>
-
-  </div>
-  
-  <div class="containerdecrypt">
-  <form id="decryptForm">
-    <input type="password" id="decryptionPassword" class="password-input" placeholder="Enter password" autocomplete="current-password" required />
-    <input type="user" style="display: none" autocomplete="username" />
-    <button type="submit" class="submit-button">Continue</button>
-  </form>
-  </div>
-
-<hr>
-
-  <div>
-    <pre id="decryptedData"></pre>
-  </div>
+    <div id="hamburgerMenu" class="closed">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div id="slideMenu">
+      <ul>
+      <li><a href="encode.html" style="margin-top: 80px" target="_blank" id="generatedatabtn">Generate data</a></li>
+    </ul>
+    </div>
+    <div class="containeroverlay">
+      <div id="overlayMenu">
+        <input type="text" id="settingsInputNumbers" class="password-input" style="width: 300px" placeholder="Paste data"><br>
+        <input type="text" id="settingsSalt" class="password-input" style="width: 300px" placeholder="Paste Salt"><br>
+        <input type="text" id="settingsIV" class="password-input" style="width: 300px" placeholder="Paste IV"><br>
+        <button id="storeBtn" class="submit-button">Save new data set</button>
+        <button id="cancelBtn" class="submit-button">Cancel</button>
+      </div>
+    </div>
+    <div class="containerdecrypt">
+      <form id="decryptForm">
+        <input type="password" id="decryptionPassword" class="password-input" placeholder="Enter password" autocomplete="current-password" required />
+        <input type="user" style="display: none" autocomplete="username" />
+        <button type="submit" class="submit-button">Continue</button>
+      </form>
+    </div>
+    <hr>
+    <div>
+      <pre id="decryptedData"></pre>
+    </div>
   </div>
 
   <script>
@@ -291,10 +284,8 @@ document.addEventListener("DOMContentLoaded", function() {
   var hamburgerMenu = document.getElementById("hamburgerMenu");
   var container = document.querySelector(".container");
   var slideMenu = document.getElementById("slideMenu");
-  var overlayMenu = document.getElementById("overlayMenu");
-  //var StoredataBtn = document.getElementById("openoverlaymenu");
+
   var databtn = document.getElementById("generatedatabtn");
-  var cancelBtn = document.getElementById("cancelBtn");
 
   hamburgerMenu.addEventListener("click", function() {
     container.classList.toggle("slide-menu-open");
@@ -307,47 +298,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  StoredataBtn.addEventListener("click", function() {
-    slideMenu.style.display = "none";
-    container.classList.toggle("slide-menu-open");
-    hamburgerMenu.classList.toggle("open");
-    overlayMenu.classList.toggle("show");
-  });
-
-  cancelBtn.addEventListener("click", function() {
-    overlayMenu.classList.toggle("show");
-  });
-
   databtn.addEventListener("click", function() {
     slideMenu.style.display = "none";
     container.classList.toggle("slide-menu-open");
     hamburgerMenu.classList.toggle("open");
   });
-
-  //storeBtn.addEventListener("click", function() {
-  //    var field1Value = document.getElementById('settingsInputNumbers').value;
-  //    var field2Value = document.getElementById('settingsSalt').value;
-  //    var field3Value = document.getElementById('settingsIV').value;
-
-      // Create an object to store the field values
-  //    var fieldValues = {
-  //      field1: field1Value,
-  //      field2: field2Value,
-  //      field3: field3Value
-  //    };
-
-      // Convert the object to a JSON string
-  //    var fieldValuesString = JSON.stringify(fieldValues);
-
-      // Set the cookie with an expiry date
-  //    var expiryDate = new Date();
-  //    expiryDate.setFullYear(expiryDate.getFullYear() + 5); // Expires in 5 years
-
-      // Set the cookie
-  //    document.cookie = 'fieldValues=' + encodeURIComponent(fieldValuesString) + '; expires=' + expiryDate.toUTCString() + '; path=/';
-
-  //    overlayMenu.classList.toggle("show");
-  //});
 
 });
 </script>
