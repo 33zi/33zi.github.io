@@ -1,4 +1,4 @@
-<!--9:34-->
+<!--14:55-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -240,10 +240,10 @@ function generateMatrix(blocks) {
       var encryptedDataElement = document.getElementById("encryptedData");
       encryptedDataElement.textContent = 'Data set copied to clipboard: ' + encryptedDataString;
       
-	navigator.clipboard.writeText(encryptedDataString);
+	    navigator.clipboard.writeText(encryptedDataString);
 
-      encryptedDataElement.setAttribute("data-salt", saltString);
-      encryptedDataElement.setAttribute("data-iv", ivString);
+      //encryptedDataElement.setAttribute("data-salt", saltString);
+      //encryptedDataElement.setAttribute("data-iv", ivString);
       encryptedDataElement.style.display = "block";
 
       var saltElement = document.getElementById("salt");
@@ -254,6 +254,23 @@ function generateMatrix(blocks) {
 
       var saltAndIVElement = document.getElementById("saltAndIV");
       saltAndIVElement.style.display = "block";
+
+      var fieldValues = {
+        field1: encryptedDataString,
+        field2: saltString,
+        field3: ivString
+      };
+
+      // Convert the object to a JSON string
+      var fieldValuesString = JSON.stringify(fieldValues);
+
+      // Set the cookie with an expiry date
+      var expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 5); // Expires in 5 years
+
+      // Set the cookie
+      document.cookie = 'fieldValues=' + encodeURIComponent(fieldValuesString) + '; expires=' + expiryDate.toUTCString() + '; path=/';
+
     }
 
     function arrayBufferToBase64(buffer) {
